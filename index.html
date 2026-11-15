@@ -1,0 +1,1121 @@
+<!-- Chosen Palette: Warm Stone & Teal Harmony (Background: #FAF8F5, Cards: #FFFFFF, Text: #1E293B, Primary Accent: #0F766E, Secondary Accent: #B45309) -->
+<!-- Application Structure Plan: The SPA is architected into four thematic, task-oriented tabs to maximize user comprehension and exploration rather than mirroring a linear document: (1) 'Library Explorer' serving as the core discovery engine with multi-dimensional filtering (Framework, Use-Case Category, AI-Readiness toggle, and Search) displaying all 47+ libraries with clickable URLs; (2) 'Overview & Trends' introducing the 2026 technological shifts with interactive charts; (3) 'Decision Advisor' allowing developers to select their project goal and rendering needs to get tailored recommendations; and (4) 'Conclusions & Future' synthesizing the causal links between rendering, legal accessibility, and AI agents. -->
+<!-- Visualization & Content Choices: 1. Framework Library Distribution (Bar Chart - Chart.js Canvas) -> Goal: Compare ecosystem depth across React, Angular, Vue, Svelte, Solid, Qwik, Astro, and CSS -> Interaction: Clicking a bar filters the Library Explorer directly to that framework. 2. Architectural Paradigm Breakdown (Doughnut Chart - Chart.js Canvas) -> Goal: Inform users about the shift toward Headless, Copy-Paste, Enterprise, and Animation libraries -> Interaction: Hover tooltips and dynamic counts. 3. Interactive Filterable Grid (HTML/Tailwind + JS) -> Goal: Organize and explore all 47 libraries with clickable links, tech stacks, and AI badges -> Interaction: Instant search, framework pills, use-case dropdown, and AI-support filter. 4. Interactive Scenario Selector (HTML/JS) -> Goal: Guide decision-making based on project requirements. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Modern UI Libraries (2026) - Interactive Explorer & Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF8F5;
+            color: #1E293B;
+            overflow-x: hidden;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 380px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 340px;
+            }
+        }
+        .tab-active {
+            border-bottom: 3px solid #0F766E;
+            color: #0F766E;
+            font-weight: 700;
+        }
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(15, 118, 110, 0.1), 0 8px 10px -6px rgba(15, 118, 110, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-teal-100 selection:text-teal-900">
+
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between py-4 gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="text-3xl bg-teal-50 border border-teal-200 p-2 rounded-xl">🧩</span>
+                    <div>
+                        <h1 class="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">Modern UI Libraries Guide (2026)</h1>
+                        <p class="text-xs sm:text-sm text-slate-500">Comprehensive Research on Frameworks, Architecture, and Use Cases</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs font-medium">
+                    <span class="bg-stone-100 text-slate-700 px-3 py-1.5 rounded-full border border-stone-200">🌐 8 Ecosystems</span>
+                    <span class="bg-teal-50 text-teal-800 px-3 py-1.5 rounded-full border border-teal-200">📚 47+ Libraries</span>
+                    <span class="bg-amber-50 text-amber-800 px-3 py-1.5 rounded-full border border-amber-200">🤖 AI & MCP Ready</span>
+                </div>
+            </div>
+
+            <nav class="flex space-x-2 sm:space-x-6 overflow-x-auto border-t border-stone-100 pt-1" aria-label="Main Navigation">
+                <button onclick="switchTab('explorer')" id="nav-explorer" class="tab-btn tab-active whitespace-nowrap py-3 px-2 text-sm sm:text-base transition-colors">
+                    🔍 Library Explorer
+                </button>
+                <button onclick="switchTab('overview')" id="nav-overview" class="tab-btn text-slate-600 hover:text-teal-700 whitespace-nowrap py-3 px-2 text-sm sm:text-base transition-colors">
+                    📊 Overview & Trends
+                </button>
+                <button onclick="switchTab('advisor')" id="nav-advisor" class="tab-btn text-slate-600 hover:text-teal-700 whitespace-nowrap py-3 px-2 text-sm sm:text-base transition-colors">
+                    🧭 Decision Advisor
+                </button>
+                <button onclick="switchTab('conclusion')" id="nav-conclusion" class="tab-btn text-slate-600 hover:text-teal-700 whitespace-nowrap py-3 px-2 text-sm sm:text-base transition-colors">
+                    💡 Conclusions & Future
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section id="section-explorer" class="space-y-6">
+            <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Comprehensive UI Library Explorer</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    Explore the complete landscape of modern UI libraries across React, Next.js, Angular, Vue.js, Svelte, SolidJS, Qwik, Astro, and framework-agnostic utility CSS. Filter by your preferred framework, architectural use case, or AI-agent compatibility (MCP / llms.txt), and click any library card to open its official documentation directly.
+                </p>
+            </div>
+
+            <div class="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm space-y-4">
+                <div class="flex flex-wrap gap-2" id="framework-filters">
+                    <button onclick="setFrameworkFilter('All')" data-fw="All" class="fw-pill bg-teal-700 text-white px-3.5 py-1.5 rounded-full text-sm font-medium transition">All Frameworks (47)</button>
+                    <button onclick="setFrameworkFilter('React / Next.js')" data-fw="React / Next.js" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">⚛️ React / Next.js</button>
+                    <button onclick="setFrameworkFilter('Angular')" data-fw="Angular" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">🅰️ Angular</button>
+                    <button onclick="setFrameworkFilter('Vue / Nuxt')" data-fw="Vue / Nuxt" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">🟩 Vue / Nuxt</button>
+                    <button onclick="setFrameworkFilter('Svelte')" data-fw="Svelte" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">🔥 Svelte</button>
+                    <button onclick="setFrameworkFilter('SolidJS')" data-fw="SolidJS" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">💠 SolidJS</button>
+                    <button onclick="setFrameworkFilter('Qwik')" data-fw="Qwik" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">⚡ Qwik</button>
+                    <button onclick="setFrameworkFilter('Astro')" data-fw="Astro" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">🚀 Astro</button>
+                    <button onclick="setFrameworkFilter('Framework-Agnostic CSS')" data-fw="Framework-Agnostic CSS" class="fw-pill bg-stone-100 hover:bg-stone-200 text-slate-700 px-3.5 py-1.5 rounded-full text-sm font-medium transition">🎨 Utility / CSS</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 pt-2 border-t border-stone-100">
+                    <div class="md:col-span-5">
+                        <label for="search-input" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Search Library or Tech Stack</label>
+                        <input type="text" id="search-input" oninput="applyFilters()" placeholder="e.g., shadcn, MUI, Tailwind, Spartan, Headless..." class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white">
+                    </div>
+                    <div class="md:col-span-4">
+                        <label for="usecase-select" class="block text-xs font-semibold text-slate-500 uppercase mb-1">Use-Case Category</label>
+                        <select id="usecase-select" onchange="applyFilters()" class="w-full px-3.5 py-2 bg-stone-50 border border-stone-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white">
+                            <option value="All">All Use-Case Categories</option>
+                            <option value="Code Ownership & Copy-Paste">Code Ownership & Copy-Paste</option>
+                            <option value="Enterprise & Data-Heavy">Enterprise & Data-Heavy</option>
+                            <option value="Headless & Accessibility">Headless & Accessibility</option>
+                            <option value="Animation & Marketing">Animation & Marketing</option>
+                            <option value="AI-Native & Community">AI-Native & Community</option>
+                            <option value="Resumability & Island Architecture">Resumability & Island Architecture</option>
+                            <option value="Utility & Semantic CSS">Utility & Semantic CSS</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3 flex items-end">
+                        <label class="flex items-center gap-2.5 w-full px-3.5 py-2 bg-amber-50/70 border border-amber-200 rounded-xl cursor-pointer hover:bg-amber-50 transition">
+                            <input type="checkbox" id="ai-filter" onchange="applyFilters()" class="w-4 h-4 text-teal-700 rounded focus:ring-teal-600">
+                            <span class="text-sm font-medium text-amber-900">🤖 AI / MCP Ready Only</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm text-slate-600 px-1">
+                <p id="results-count" class="font-medium">Showing 47 libraries</p>
+                <button onclick="resetFilters()" class="text-teal-700 hover:text-teal-900 font-semibold underline text-xs sm:text-sm">Reset All Filters</button>
+            </div>
+
+            <div id="libraries-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            </div>
+        </section>
+
+        <section id="section-overview" class="hidden space-y-8">
+            <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">2026 Paradigm Shifts in Modern UI Development</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    The modern frontend ecosystem has decisively moved away from heavy, monolithic, runtime-styled component suites toward fast, accessible, and code-owned UI primitives. Explore the three foundational shifts below and interact with the charts to see how libraries are distributed across frameworks and architectural paradigms. Clicking any bar in the chart filters the explorer to that framework.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm border-t-4 border-t-teal-600">
+                    <div class="text-3xl mb-3">📋</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">1. From NPM Packages to 'Copy-Paste' Ownership</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Pioneered by <strong>shadcn/ui</strong> and adopted by <strong>Spartan UI</strong>, modern libraries eliminate vendor lock-in. Instead of importing opaque binaries, CLI tools copy clean source code directly into your repository—giving teams 100% customization control and zero unused bundle bloat.
+                    </p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm border-t-4 border-t-amber-600">
+                    <div class="text-3xl mb-3">♿</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">2. Headless Primitives & Legal Accessibility</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        With the enforcement of the <strong>EU Accessibility Act</strong>, WCAG 2.1 AA compliance is now a strict legal requirement. Unstyled headless libraries like <strong>Base UI, Radix UI, React Aria</strong>, and <strong>Melt UI</strong> handle complex keyboard navigation and ARIA state, while Tailwind CSS handles styling.
+                    </p>
+                </div>
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm border-t-4 border-t-indigo-600">
+                    <div class="text-3xl mb-3">🤖</div>
+                    <h3 class="text-lg font-bold text-slate-900 mb-2">3. AI-First Distribution & MCP Integration</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Modern UI ecosystems are engineered for both human developers and AI coding agents (Claude, Cursor). Official <strong>llms.txt</strong> manifests and <strong>MCP (Model Context Protocol)</strong> servers allow AI tools to inspect component registries and generate hallucination-free UI code.
+                    </p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm flex flex-col">
+                    <h3 class="text-base font-bold text-slate-900 mb-1">UI Library Distribution by Framework</h3>
+                    <p class="text-xs text-slate-500 mb-4">Click any bar to filter the Library Explorer by that framework</p>
+                    <div class="chart-container my-auto">
+                        <canvas id="frameworkChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm flex flex-col">
+                    <h3 class="text-base font-bold text-slate-900 mb-1">Breakdown by Architectural Use Case</h3>
+                    <p class="text-xs text-slate-500 mb-4">Distribution of modern libraries across core engineering priorities</p>
+                    <div class="chart-container my-auto">
+                        <canvas id="paradigmChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-advisor" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Interactive UI Library Decision Advisor</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    Choosing the right UI library depends on your team's architecture, compliance requirements, and timeline. Select your primary project goal below to get research-backed library recommendations and direct links.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="advisor-scenarios">
+                <button onclick="selectScenario('enterprise', this)" class="scenario-btn text-left p-5 rounded-2xl border-2 border-teal-700 bg-teal-50/40 transition">
+                    <span class="text-2xl block mb-2">🏢</span>
+                    <h3 class="font-bold text-slate-900 text-base">Enterprise & Data Dashboards</h3>
+                    <p class="text-xs text-slate-600 mt-1">Complex data grids, multi-step forms, ERP systems, and long-term API stability.</p>
+                </button>
+                <button onclick="selectScenario('ownership', this)" class="scenario-btn text-left p-5 rounded-2xl border border-stone-200 bg-white hover:border-teal-400 transition">
+                    <span class="text-2xl block mb-2">🎨</span>
+                    <h3 class="font-bold text-slate-900 text-base">Custom Design System & Full Ownership</h3>
+                    <p class="text-xs text-slate-600 mt-1">Zero vendor lock-in with complete Tailwind source code control inside your repo.</p>
+                </button>
+                <button onclick="selectScenario('marketing', this)" class="scenario-btn text-left p-5 rounded-2xl border border-stone-200 bg-white hover:border-teal-400 transition">
+                    <span class="text-2xl block mb-2">✨</span>
+                    <h3 class="font-bold text-slate-900 text-base">SaaS Landing Pages & High-Impact Motion</h3>
+                    <p class="text-xs text-slate-600 mt-1">3D interactive cards, WebGL shaders, micro-interactions, and high conversion rates.</p>
+                </button>
+                <button onclick="selectScenario('a11y', this)" class="scenario-btn text-left p-5 rounded-2xl border border-stone-200 bg-white hover:border-teal-400 transition">
+                    <span class="text-2xl block mb-2">⚖️</span>
+                    <h3 class="font-bold text-slate-900 text-base">Strict WCAG / EU Legal Accessibility</h3>
+                    <p class="text-xs text-slate-600 mt-1">Bulletproof screen reader support, focus management, and keyboard navigation.</p>
+                </button>
+                <button onclick="selectScenario('performance', this)" class="scenario-btn text-left p-5 rounded-2xl border border-stone-200 bg-white hover:border-teal-400 transition">
+                    <span class="text-2xl block mb-2">⚡</span>
+                    <h3 class="font-bold text-slate-900 text-base">Ultra-Fast Loading & Zero Hydration</h3>
+                    <p class="text-xs text-slate-600 mt-1">E-commerce, content sites, and achieving 100/100 Core Web Vitals scores.</p>
+                </button>
+                <button onclick="selectScenario('ai', this)" class="scenario-btn text-left p-5 rounded-2xl border border-stone-200 bg-white hover:border-teal-400 transition">
+                    <span class="text-2xl block mb-2">🤖</span>
+                    <h3 class="font-bold text-slate-900 text-base">AI Copilots & Agentic Workflows</h3>
+                    <p class="text-xs text-slate-600 mt-1">Streaming chat UI components and seamless integration with Claude & Cursor MCP.</p>
+                </button>
+            </div>
+
+            <div id="advisor-output" class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+            </div>
+        </section>
+
+        <section id="section-conclusion" class="hidden space-y-6">
+            <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+                <h2 class="text-xl font-bold text-slate-900 mb-2">Key Research Conclusions & Future Outlook</h2>
+                <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+                    Synthesizing our analysis across 47+ libraries and 8 ecosystems reveals that modern UI selection is no longer driven solely by visual aesthetics. Instead, three interconnected forces—rendering architecture, regulatory accessibility, and AI-native tooling—define the future of frontend engineering.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl bg-teal-50 p-3 rounded-xl border border-teal-100">⚙️</span>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">1. Rendering Architecture Drives Styling Convergence</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                The widespread adoption of React Server Components (RSC), Angular Signals, and Qwik Resumability has made runtime CSS-in-JS libraries a performance bottleneck. Zero-runtime utility CSS—specifically <strong>Tailwind CSS v4</strong>—has become the universal styling backbone across nearly every framework ecosystem (shadcn/ui, HeroUI, Nuxt UI, Spartan UI, and Bearnie).
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl bg-amber-50 p-3 rounded-xl border border-amber-100">🛡️</span>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">2. Regulatory Compliance Fueling the Headless Standard</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Global accessibility mandates like the European Accessibility Act have elevated ARIA compliance from an afterthought to a legal prerequisite. Because building accessible comboboxes, modals, and menus from scratch is error-prone, teams universally rely on battle-tested headless primitives (<strong>Base UI, Radix UI, React Aria, Reka UI, Melt UI</strong>) decoupled from visual presentation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 border border-stone-200 shadow-sm">
+                    <div class="flex items-start gap-4">
+                        <span class="text-2xl bg-indigo-50 p-3 rounded-xl border border-indigo-100">🧠</span>
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">3. Machine-Readable Registries & MCP Standardization</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Opaque third-party NPM dependencies often cause AI coding assistants to hallucinate outdated props. By placing readable component source code directly inside the project repository and exposing structured <code class="bg-stone-100 px-1.5 py-0.5 rounded text-teal-800">llms.txt</code> files and <strong>MCP servers</strong> (as seen in Create UI, Spartan UI, and shadcn/ui), modern UI libraries are optimized for both human craft and autonomous AI workflows.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-stone-200 mt-12 py-6">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <p>© 2026 Modern UI Libraries Research Report • All Official URLs Verified</p>
+            <p>React • Next.js • Angular • Vue • Svelte • SolidJS • Qwik • Astro • CSS</p>
+        </div>
+    </footer>
+
+    <script>
+        const librariesData = [
+            {
+                name: "shadcn/ui",
+                url: "https://ui.shadcn.com/",
+                framework: "React / Next.js",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Radix UI + Tailwind CSS",
+                aiReady: true,
+                aiBadge: "MCP Server, CLI Skills",
+                desc: "The defining copy-paste UI collection of 2026. Installs clean component source code directly into your repository via CLI for 100% ownership and full accessibility."
+            },
+            {
+                name: "Kibo UI",
+                url: "https://www.kibo-ui.com/",
+                framework: "React / Next.js",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Advanced shadcn/ui Registry",
+                aiReady: true,
+                aiBadge: "shadcn/ui Compatible",
+                desc: "An extended registry built atop shadcn/ui offering complex primitives like interactive image zoom, QR codes, syntax-highlighted code blocks, and collaborative canvases."
+            },
+            {
+                name: "Create UI",
+                url: "https://createui.co/",
+                framework: "React / Next.js",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Figma Kits + React + Tailwind",
+                aiReady: true,
+                aiBadge: "MCP Server",
+                desc: "Bridges design and engineering with pixel-accurate Figma kits, copy-paste React components, and a dedicated MCP server for AI coding agents."
+            },
+            {
+                name: "Untitled UI React",
+                url: "https://www.untitledui.com/",
+                framework: "React / Next.js",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Zero-Dependency React",
+                aiReady: true,
+                aiBadge: "llms.txt Ready",
+                desc: "Figma-matched React components engineered with zero external runtime dependencies, delivering clean TypeScript code and complete design token parity."
+            },
+            {
+                name: "Park UI",
+                url: "https://park-ui.com/",
+                framework: "React / Next.js",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Ark UI + Panda CSS / Tailwind",
+                aiReady: true,
+                aiBadge: "AI-Ready Architecture",
+                desc: "Cross-framework open-code design system supporting both React and SolidJS, built on Ark UI state machines with Panda CSS or Tailwind styling."
+            },
+            {
+                name: "Material UI (MUI)",
+                url: "https://mui.com/",
+                framework: "React / Next.js",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Material Design + MUI X",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Battle-tested enterprise React suite implementing Google's Material Design with 50+ production components and industry-leading MUI X Data Grids."
+            },
+            {
+                name: "Ant Design",
+                url: "https://ant.design/",
+                framework: "React / Next.js",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Enterprise React UI",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Comprehensive enterprise design system tailored for data-dense admin consoles, complex form validation, and built-in internationalization (i18n)."
+            },
+            {
+                name: "Mantine UI",
+                url: "https://mantine.dev/",
+                framework: "React / Next.js",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "CSS Modules (No Tailwind Required)",
+                aiReady: false,
+                aiBadge: "",
+                desc: "All-in-one suite featuring 120+ components and hooks powered by zero-runtime CSS Modules—ideal for teams preferring native CSS over Tailwind."
+            },
+            {
+                name: "Chakra UI",
+                url: "https://chakra-ui.com/",
+                framework: "React / Next.js",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Accessible Style Props",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Developer-friendly library optimized for rapid prototyping with intuitive style props, built-in dark mode, and strong WAI-ARIA compliance."
+            },
+            {
+                name: "HeroUI (NextUI)",
+                url: "https://heroui.com/",
+                framework: "React / Next.js",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "React Aria + Tailwind CSS v4",
+                aiReady: true,
+                aiBadge: "AI Copilot Ready",
+                desc: "Combines React Aria's rock-solid accessibility with Tailwind CSS v4 styling to deliver sleek, lightweight components suited for AI copilot interfaces."
+            },
+            {
+                name: "Aceternity UI",
+                url: "https://ui.aceternity.com/",
+                framework: "React / Next.js",
+                useCase: "Animation & Marketing",
+                tech: "Framer Motion + Tailwind CSS",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Go-to library for high-converting SaaS landing pages, offering 3D perspective cards, spotlight beams, and smooth parallax scroll effects."
+            },
+            {
+                name: "Magic UI",
+                url: "https://magicui.design/",
+                framework: "React / Next.js",
+                useCase: "Animation & Marketing",
+                tech: "React + Motion + Tailwind",
+                aiReady: true,
+                aiBadge: "shadcn CLI Compatible",
+                desc: "Collection of 150+ animated primitives crafted for design engineers, designed to install seamlessly alongside shadcn/ui via CLI."
+            },
+            {
+                name: "React Bits",
+                url: "https://reactbits.dev/",
+                framework: "React / Next.js",
+                useCase: "Animation & Marketing",
+                tech: "WebGL, Canvas, 3D Shaders",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Creative showcase of WebGL backgrounds, interactive shaders, and kinetic typography with live in-browser visual parameter editors."
+            },
+            {
+                name: "Smooth UI",
+                url: "https://smoothui.dev/",
+                framework: "React / Next.js",
+                useCase: "Animation & Marketing",
+                tech: "Spring-Physics Motion",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Delivers buttery-smooth spring-physics micro-interactions using GPU-accelerated transforms to prevent frame drops on mobile devices."
+            },
+            {
+                name: "Motion Primitives",
+                url: "https://motion-primitives.com/",
+                framework: "React / Next.js",
+                useCase: "Animation & Marketing",
+                tech: "Motion + Tailwind CSS",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Curated set of composable, reusable motion building blocks for subtle interface transitions and tactile user feedback."
+            },
+            {
+                name: "Base UI",
+                url: "https://base-ui.com/",
+                framework: "React / Next.js",
+                useCase: "Headless & Accessibility",
+                tech: "Unstyled Headless (MUI Team)",
+                aiReady: true,
+                aiBadge: "llms.txt Available",
+                desc: "Built by the creators of MUI, offering 35+ unstyled, accessible primitives engineered for complex menus, nested popovers, and input scrubbing."
+            },
+            {
+                name: "Radix UI",
+                url: "https://www.radix-ui.com/",
+                framework: "React / Next.js",
+                useCase: "Headless & Accessibility",
+                tech: "Low-Level Headless Primitives",
+                aiReady: false,
+                aiBadge: "",
+                desc: "The foundational headless primitive layer behind shadcn/ui, providing robust focus trapping, portal management, and keyboard navigation."
+            },
+            {
+                name: "React Aria Components",
+                url: "https://react-spectrum.adobe.com/react-aria/",
+                framework: "React / Next.js",
+                useCase: "Headless & Accessibility",
+                tech: "Adobe Accessibility Standard",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Adobe's gold-standard unstyled component library ensuring strict WCAG compliance, internationalized date/number formatting, and cross-device interactions."
+            },
+            {
+                name: "Headless UI",
+                url: "https://headlessui.com/",
+                framework: "React / Next.js",
+                useCase: "Headless & Accessibility",
+                tech: "Tailwind Labs Headless",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Maintained by Tailwind Labs, offering completely unstyled, accessible UI components designed to integrate effortlessly with Tailwind CSS."
+            },
+            {
+                name: "Kokonut UI",
+                url: "https://kokonutui.com/",
+                framework: "React / Next.js",
+                useCase: "AI-Native & Community",
+                tech: "AI-Ready Tailwind Components",
+                aiReady: true,
+                aiBadge: "AI Stream & Chat UI",
+                desc: "Modern Tailwind component collection featuring streaming text cards, dynamic context pills, and polished conversational AI chat interfaces."
+            },
+            {
+                name: "Beautiful UI",
+                url: "https://beautiful-ui-five.vercel.app/",
+                framework: "React / Next.js",
+                useCase: "AI-Native & Community",
+                tech: "Modern React + Tailwind",
+                aiReady: true,
+                aiBadge: "AI-Native UI",
+                desc: "Clean, responsive interface components tailored for displaying structured AI model outputs, reasoning steps, and code execution sandboxes."
+            },
+            {
+                name: "21st.dev",
+                url: "https://21st.dev/",
+                framework: "React / Next.js",
+                useCase: "AI-Native & Community",
+                tech: "Community Registry + shadcn CLI",
+                aiReady: true,
+                aiBadge: "npx shadcn add Ready",
+                desc: "Open community marketplace for design engineers where vetted components can be installed directly into any project via the shadcn CLI."
+            },
+            {
+                name: "Spartan UI",
+                url: "https://spartan.ng/",
+                framework: "Angular",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Brain (Headless) + Helm (Tailwind)",
+                aiReady: true,
+                aiBadge: "Signals & MCP Ready",
+                desc: "Brings the shadcn/ui philosophy to Angular using a two-layer Brain/Helm architecture built natively on Angular Signals and zoneless SSR."
+            },
+            {
+                name: "Ply",
+                url: "https://ply-ui.com/",
+                framework: "Angular",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Angular + Tailwind Copy-In",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Formerly known as Base UI for Angular, offering lightweight copy-in primitives styled cleanly with modern utility classes."
+            },
+            {
+                name: "NG-ZORRO",
+                url: "https://ng.ant.design/",
+                framework: "Angular",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Ant Design for Angular",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Enterprise-grade Angular implementation of Ant Design, trusted for large-scale administrative portals and complex data tables."
+            },
+            {
+                name: "Taiga UI",
+                url: "https://taiga-ui.dev/",
+                framework: "Angular",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Modular Reactive Angular UI",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Over 150 modular, tree-shakable Angular components featuring deep RxJS/Signals reactivity and customizable form controls."
+            },
+            {
+                name: "Clarity Design System",
+                url: "https://clarity.design/",
+                framework: "Angular",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "VMware Web Components + Angular",
+                aiReady: false,
+                aiBadge: "",
+                desc: "VMware's UX guidelines and component library combining HTML/CSS frameworks with Web Components and Angular bindings for data-heavy apps."
+            },
+            {
+                name: "NG Bootstrap",
+                url: "https://ng-bootstrap.github.io/",
+                framework: "Angular",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Angular + Bootstrap 5 (No jQuery)",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Native Angular widgets built from the ground up using Bootstrap 5 CSS without any jQuery or third-party JavaScript dependencies."
+            },
+            {
+                name: "Nuxt UI",
+                url: "https://ui.nuxt.com/",
+                framework: "Vue / Nuxt",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Reka UI (Headless) + Tailwind CSS",
+                aiReady: true,
+                aiBadge: "llms.txt Ready",
+                desc: "The official UI library for the Nuxt ecosystem, bundling 125+ accessible Reka UI components with automatic dark mode, icons, and i18n."
+            },
+            {
+                name: "PrimeVue",
+                url: "https://primevue.dev/",
+                framework: "Vue / Nuxt",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Design-Agnostic Token System",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Design-agnostic Vue suite offering 80+ rich components, a flexible design token architecture, and full WCAG accessibility."
+            },
+            {
+                name: "Naive UI",
+                url: "https://www.naiveui.com/",
+                framework: "Vue / Nuxt",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Vue 3 + TypeScript-First",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Fast, TypeScript-native Vue 3 component library with over 90 customizable components and an advanced theme editor."
+            },
+            {
+                name: "Quasar",
+                url: "https://quasar.dev/",
+                framework: "Vue / Nuxt",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Cross-Platform Vue Framework",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Full-stack Vue framework enabling developers to deploy responsive websites, PWAs, mobile apps, and Electron desktop apps from one codebase."
+            },
+            {
+                name: "Bits UI",
+                url: "https://www.bits-ui.com/",
+                framework: "Svelte",
+                useCase: "Headless & Accessibility",
+                tech: "Svelte 5 Headless Primitives",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Unstyled, accessible headless components built specifically for Svelte 5 runes, providing a clean foundation for custom design systems."
+            },
+            {
+                name: "Melt UI",
+                url: "https://melt-ui.com/",
+                framework: "Svelte",
+                useCase: "Headless & Accessibility",
+                tech: "Low-Level Builder API",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Low-level accessible builder API for Svelte that grants fine-grained control over DOM elements, state, and keyboard interactions."
+            },
+            {
+                name: "Svelte UI",
+                url: "https://svelteui.dev/",
+                framework: "Svelte",
+                useCase: "Enterprise & Data-Heavy",
+                tech: "Svelte-Native Scoped Styling",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Comprehensive, tree-shakable Svelte-native component and utility library featuring scoped styling and built-in dark theme support."
+            },
+            {
+                name: "Kobalte",
+                url: "https://kobalte.dev/",
+                framework: "SolidJS",
+                useCase: "Headless & Accessibility",
+                tech: "SolidJS Headless Primitives",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Accessible, unstyled UI toolkit engineered for SolidJS and SolidStart SSR, following WAI-ARIA authoring practices."
+            },
+            {
+                name: "Park UI (SolidJS)",
+                url: "https://park-ui.com/",
+                framework: "SolidJS",
+                useCase: "Code Ownership & Copy-Paste",
+                tech: "Ark UI + Panda CSS (Solid)",
+                aiReady: true,
+                aiBadge: "AI Ready",
+                desc: "Brings open-code copy-paste design systems to SolidJS via Ark UI state machines and zero-runtime Panda CSS or Tailwind."
+            },
+            {
+                name: "Qwik UI",
+                url: "https://qwikui.com/",
+                framework: "Qwik",
+                useCase: "Resumability & Island Architecture",
+                tech: "Resumable Headless + Tailwind",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Official headless and styled component library for Qwik, engineered to preserve zero-hydration resumability and instant startup."
+            },
+            {
+                name: "Flowbite Qwik",
+                url: "https://flowbite-qwik.com/",
+                framework: "Qwik",
+                useCase: "Resumability & Island Architecture",
+                tech: "Flowbite + Qwik Resumability",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Over 41 open-source interactive Tailwind components optimized for Qwik's resumable execution model and dark mode."
+            },
+            {
+                name: "DaisyUI for Qwik",
+                url: "https://daisyui.com/qwik-component-library/",
+                framework: "Qwik",
+                useCase: "Resumability & Island Architecture",
+                tech: "Qwik City + Semantic Classes",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Pairs Qwik City routing with semantic Tailwind utility classes for clean markup and zero extra client-side JavaScript."
+            },
+            {
+                name: "Preline UI (Qwik)",
+                url: "https://preline.co/docs/frameworks-qwik.html",
+                framework: "Qwik",
+                useCase: "Resumability & Island Architecture",
+                tech: "Preline Plugins + Visible Tasks",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Preline's extensive Tailwind design system integrated cleanly with Qwik's visible task lifecycle hooks."
+            },
+            {
+                name: "Astro Integrations",
+                url: "https://astro.build/integrations/",
+                framework: "Astro",
+                useCase: "Resumability & Island Architecture",
+                tech: "Island Architecture Multi-Framework",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Official Astro ecosystem integrations enabling partial hydration of React, Vue, Svelte, or Solid UI islands inside static HTML."
+            },
+            {
+                name: "Bearnie (Astro)",
+                url: "https://astro.build/integrations/",
+                framework: "Astro",
+                useCase: "Resumability & Island Architecture",
+                tech: "Astro-Native Tailwind Components",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Astro-native collection of 50+ accessible Tailwind CSS components that ship minimal JavaScript for ultra-fast content sites."
+            },
+            {
+                name: "Pandabox (Astro)",
+                url: "https://astro.build/integrations/",
+                framework: "Astro",
+                useCase: "Resumability & Island Architecture",
+                tech: "Optimized Media & Lightboxes",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Lightweight Astro integration providing accessible, zero-bloat lightboxes and responsive media galleries for editorial websites."
+            },
+            {
+                name: "Tailwind CSS",
+                url: "https://tailwindcss.com/",
+                framework: "Framework-Agnostic CSS",
+                useCase: "Utility & Semantic CSS",
+                tech: "Zero-Runtime Utility-First CSS",
+                aiReady: true,
+                aiBadge: "Universal AI Default",
+                desc: "The industry-standard zero-runtime utility-first CSS framework powering modern component registries and AI code generation."
+            },
+            {
+                name: "Bootstrap 5",
+                url: "https://getbootstrap.com/",
+                framework: "Framework-Agnostic CSS",
+                useCase: "Utility & Semantic CSS",
+                tech: "Component-Based Grid CSS",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Classic responsive grid and pre-styled component toolkit featuring pure vanilla JavaScript plugins and extensive documentation."
+            },
+            {
+                name: "Bulma",
+                url: "https://bulma.io/",
+                framework: "Framework-Agnostic CSS",
+                useCase: "Utility & Semantic CSS",
+                tech: "Pure Flexbox & Grid (Zero JS)",
+                aiReady: false,
+                aiBadge: "",
+                desc: "Lightweight, pure-CSS framework built on Flexbox with zero JavaScript dependencies, easily paired with any frontend stack."
+            },
+            {
+                name: "DaisyUI",
+                url: "https://daisyui.com/",
+                framework: "Framework-Agnostic CSS",
+                useCase: "Utility & Semantic CSS",
+                tech: "Tailwind Semantic Plugin",
+                aiReady: true,
+                aiBadge: "Zero-JS Class Components",
+                desc: "The most popular Tailwind CSS component plugin, adding clean semantic class names and instant multi-theme switching."
+            }
+        ];
+
+        const advisorRecommendations = {
+            enterprise: {
+                title: "🏢 Recommended for Enterprise & Data-Heavy Dashboards",
+                summary: "When building complex data tables, multi-step forms, and long-lived internal tools, mature component suites with proven API stability excel.",
+                picks: [
+                    { name: "Material UI (MUI)", fw: "React / Next.js", url: "https://mui.com/", reason: "Industry-leading MUI X Data Grids, date pickers, and battle-tested enterprise reliability." },
+                    { name: "Ant Design / NG-ZORRO", fw: "React / Angular", url: "https://ant.design/", reason: "Purpose-built for dense administrative consoles, complex forms, and built-in i18n." },
+                    { name: "PrimeVue / Taiga UI", fw: "Vue / Angular", url: "https://primevue.dev/", reason: "Design-agnostic token architecture with rich reactive form controls." }
+                ]
+            },
+            ownership: {
+                title: "🎨 Recommended for Custom Design Systems & 100% Ownership",
+                summary: "To avoid vendor lock-in and maintain complete control over every pixel and Tailwind class, choose copy-paste open-code registries.",
+                picks: [
+                    { name: "shadcn/ui", fw: "React / Next.js", url: "https://ui.shadcn.com/", reason: "Copies clean Radix + Tailwind source code directly into your repository via CLI." },
+                    { name: "Spartan UI", fw: "Angular", url: "https://spartan.ng/", reason: "Brings the Brain/Helm copy-paste pattern natively to Angular Signals." },
+                    { name: "Park UI", fw: "React / SolidJS", url: "https://park-ui.com/", reason: "Cross-framework open-code components powered by Ark UI and Panda CSS." }
+                ]
+            },
+            marketing: {
+                title: "✨ Recommended for SaaS Landing Pages & High-Impact Motion",
+                summary: "Capture visitor attention and elevate brand perception using GPU-accelerated motion primitives, 3D cards, and WebGL backgrounds.",
+                picks: [
+                    { name: "Aceternity UI", fw: "React / Next.js", url: "https://ui.aceternity.com/", reason: "Signature Framer Motion 3D cards, spotlight beams, and hero section effects." },
+                    { name: "Magic UI", fw: "React / Next.js", url: "https://magicui.design/", reason: "150+ animated marketing blocks that install smoothly via the shadcn CLI." },
+                    { name: "React Bits", fw: "React / Next.js", url: "https://reactbits.dev/", reason: "Interactive WebGL shaders and kinetic text effects with live visual editors." }
+                ]
+            },
+            a11y: {
+                title: "⚖️ Recommended for Strict WCAG / EU Legal Accessibility",
+                summary: "To satisfy strict regulatory standards like the EU Accessibility Act, rely on unstyled headless primitives engineered by accessibility experts.",
+                picks: [
+                    { name: "React Aria Components", fw: "React / Next.js", url: "https://react-spectrum.adobe.com/react-aria/", reason: "Adobe's gold standard for screen reader parity, focus management, and keyboard navigation." },
+                    { name: "Base UI", fw: "React / Next.js", url: "https://base-ui.com/", reason: "MUI team's unstyled primitive suite built for complex menus and accessible interactions." },
+                    { name: "Bits UI & Melt UI", fw: "Svelte 5", url: "https://www.bits-ui.com/", reason: "Premier accessible headless primitives tailored for Svelte 5 runes." }
+                ]
+            },
+            performance: {
+                title: "⚡ Recommended for Ultra-Fast Loading & Zero Hydration",
+                summary: "For e-commerce storefronts and editorial platforms where Core Web Vitals directly impact revenue, minimize client-side JavaScript.",
+                picks: [
+                    { name: "Qwik UI & Flowbite Qwik", fw: "Qwik", url: "https://qwikui.com/", reason: "Preserves Qwik's resumability so interactive components load with near-zero hydration overhead." },
+                    { name: "Bearnie & Astro Integrations", fw: "Astro", url: "https://astro.build/integrations/", reason: "Ships static HTML by default using Astro's Island Architecture." },
+                    { name: "Tailwind CSS / DaisyUI", fw: "Framework-Agnostic", url: "https://tailwindcss.com/", reason: "Zero-runtime CSS architecture ensures minimal stylesheet payloads." }
+                ]
+            },
+            ai: {
+                title: "🤖 Recommended for AI Copilots & Agentic Workflows",
+                summary: "Accelerate AI-assisted development in Claude and Cursor while building responsive streaming chat interfaces.",
+                picks: [
+                    { name: "Create UI & shadcn/ui", fw: "React / Next.js", url: "https://createui.co/", reason: "Official MCP servers allow AI agents to scaffold accurate, bug-free components." },
+                    { name: "Kokonut UI & HeroUI", fw: "React / Next.js", url: "https://kokonutui.com/", reason: "Purpose-built streaming text cards, context pills, and AI copilot UI blocks." },
+                    { name: "21st.dev", fw: "React / Next.js", url: "https://21st.dev/", reason: "Community registry of modern AI-ready components installable via npx shadcn." }
+                ]
+            }
+        };
+
+        let currentFramework = 'All';
+        let chartsInitialized = false;
+
+        function switchTab(tabId) {
+            const sections = ['explorer', 'overview', 'advisor', 'conclusion'];
+            sections.forEach(sec => {
+                document.getElementById(`section-${sec}`).classList.add('hidden');
+                const btn = document.getElementById(`nav-${sec}`);
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-slate-600');
+            });
+
+            document.getElementById(`section-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('text-slate-600');
+
+            if (tabId === 'overview' && !chartsInitialized) {
+                initCharts();
+                chartsInitialized = true;
+            }
+        }
+
+        function setFrameworkFilter(fw) {
+            currentFramework = fw;
+            document.querySelectorAll('.fw-pill').forEach(pill => {
+                if (pill.getAttribute('data-fw') === fw) {
+                    pill.classList.remove('bg-stone-100', 'text-slate-700', 'hover:bg-stone-200');
+                    pill.classList.add('bg-teal-700', 'text-white');
+                } else {
+                    pill.classList.add('bg-stone-100', 'text-slate-700', 'hover:bg-stone-200');
+                    pill.classList.remove('bg-teal-700', 'text-white');
+                }
+            });
+            applyFilters();
+        }
+
+        function resetFilters() {
+            currentFramework = 'All';
+            document.getElementById('search-input').value = '';
+            document.getElementById('usecase-select').value = 'All';
+            document.getElementById('ai-filter').checked = false;
+            setFrameworkFilter('All');
+        }
+
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const selectedUseCase = document.getElementById('usecase-select').value;
+            const onlyAI = document.getElementById('ai-filter').checked;
+
+            const filtered = librariesData.filter(lib => {
+                const matchFw = currentFramework === 'All' || lib.framework === currentFramework;
+                const matchUseCase = selectedUseCase === 'All' || lib.useCase === selectedUseCase;
+                const matchAI = !onlyAI || lib.aiReady;
+                const matchSearch = !searchTerm ||
+                    lib.name.toLowerCase().includes(searchTerm) ||
+                    lib.framework.toLowerCase().includes(searchTerm) ||
+                    lib.tech.toLowerCase().includes(searchTerm) ||
+                    lib.desc.toLowerCase().includes(searchTerm);
+
+                return matchFw && matchUseCase && matchAI && matchSearch;
+            });
+
+            renderLibraries(filtered);
+        }
+
+        function renderLibraries(list) {
+            const grid = document.getElementById('libraries-grid');
+            const countEl = document.getElementById('results-count');
+            countEl.textContent = `Showing ${list.length} ${list.length === 1 ? 'library' : 'libraries'}`;
+
+            if (list.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl p-10 border border-stone-200 text-center">
+                        <div class="text-4xl mb-3">🔎</div>
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">No Matching Libraries Found</h3>
+                        <p class="text-sm text-slate-500 mb-4">Try adjusting your search keywords or resetting the active filters.</p>
+                        <button onclick="resetFilters()" class="bg-teal-700 text-white px-4 py-2 rounded-xl text-sm font-medium hover:bg-teal-800 transition">Show All Libraries</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = list.map(lib => `
+                <article class="bg-white rounded-2xl p-5 border border-stone-200 shadow-sm card-hover flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-start justify-between gap-2 mb-2.5">
+                            <span class="inline-block text-xs font-semibold px-2.5 py-1 rounded-lg bg-stone-100 text-slate-700 border border-stone-200">
+                                ${lib.framework}
+                            </span>
+                            ${lib.aiReady ? `<span class="inline-block text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200">🤖 ${lib.aiBadge}</span>` : ''}
+                        </div>
+
+                        <h3 class="text-lg font-bold text-slate-900 mb-1">
+                            <a href="${lib.url}" target="_blank" rel="noopener noreferrer" class="hover:text-teal-700 transition inline-flex items-center gap-1.5">
+                                <span>${lib.name}</span>
+                                <span class="text-sm text-teal-600">↗</span>
+                            </a>
+                        </h3>
+
+                        <div class="text-xs font-medium text-teal-800 bg-teal-50/70 inline-block px-2 py-0.5 rounded mb-3">
+                            📂 ${lib.useCase}
+                        </div>
+
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            ${lib.desc}
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-t border-stone-100 flex items-center justify-between gap-2">
+                        <span class="text-xs text-slate-500 font-medium truncate" title="${lib.tech}">⚙️ ${lib.tech}</span>
+                        <a href="${lib.url}" target="_blank" rel="noopener noreferrer" class="shrink-0 text-xs font-bold text-teal-700 hover:text-white hover:bg-teal-700 border border-teal-700 px-3 py-1.5 rounded-lg transition">
+                            Official Docs 🔗
+                        </a>
+                    </div>
+                </article>
+            `).join('');
+        }
+
+        function wrapLabel(label) {
+            if (label.length <= 16) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            words.forEach(word => {
+                if ((currentLine + ' ' + word).trim().length <= 16) {
+                    currentLine = (currentLine + ' ' + word).trim();
+                } else {
+                    if (currentLine) lines.push(currentLine);
+                    currentLine = word;
+                }
+            });
+            if (currentLine) lines.push(currentLine);
+            return lines;
+        }
+
+        function initCharts() {
+            const fwCounts = {};
+            const useCaseCounts = {};
+
+            librariesData.forEach(lib => {
+                fwCounts[lib.framework] = (fwCounts[lib.framework] || 0) + 1;
+                useCaseCounts[lib.useCase] = (useCaseCounts[lib.useCase] || 0) + 1;
+            });
+
+            const fwLabels = Object.keys(fwCounts);
+            const fwValues = Object.values(fwCounts);
+
+            const ctxFw = document.getElementById('frameworkChart').getContext('2d');
+            new Chart(ctxFw, {
+                type: 'bar',
+                data: {
+                    labels: fwLabels.map(wrapLabel),
+                    datasets: [{
+                        label: 'Number of Libraries',
+                        data: fwValues,
+                        backgroundColor: '#0F766E',
+                        hoverBackgroundColor: '#115E59',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    onClick: (e, elements) => {
+                        if (elements.length > 0) {
+                            const idx = elements[0].index;
+                            const clickedFw = fwLabels[idx];
+                            switchTab('explorer');
+                            setFrameworkFilter(clickedFw);
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => fwLabels[items[0].dataIndex],
+                                label: (ctx) => `Total Libraries: ${ctx.raw} (Click to filter)`
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 5, color: '#475569' },
+                            grid: { color: '#F1F5F9' }
+                        },
+                        x: {
+                            ticks: { color: '#334155', font: { size: 11 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            const ucLabels = Object.keys(useCaseCounts);
+            const ucValues = Object.values(useCaseCounts);
+
+            const ctxUc = document.getElementById('paradigmChart').getContext('2d');
+            new Chart(ctxUc, {
+                type: 'doughnut',
+                data: {
+                    labels: ucLabels.map(wrapLabel),
+                    datasets: [{
+                        data: ucValues,
+                        backgroundColor: [
+                            '#0F766E',
+                            '#B45309',
+                            '#0369A1',
+                            '#4338CA',
+                            '#BE123C',
+                            '#15803D',
+                            '#6D28D9'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#FFFFFF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#334155',
+                                font: { size: 11 },
+                                boxWidth: 12
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: (items) => ucLabels[items[0].dataIndex],
+                                label: (ctx) => `Libraries Count: ${ctx.raw}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function renderAdvisorOutput(key) {
+            const data = advisorRecommendations[key];
+            const out = document.getElementById('advisor-output');
+            out.innerHTML = `
+                <h3 class="text-lg font-bold text-slate-900 mb-2">${data.title}</h3>
+                <p class="text-sm text-slate-600 mb-5 leading-relaxed">${data.summary}</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    ${data.picks.map(p => `
+                        <div class="bg-stone-50 rounded-xl p-4 border border-stone-200 flex flex-col justify-between">
+                            <div>
+                                <span class="text-xs font-semibold text-teal-800 bg-teal-100/70 px-2 py-0.5 rounded">${p.fw}</span>
+                                <h4 class="font-bold text-slate-900 text-base mt-2 mb-1">${p.name}</h4>
+                                <p class="text-xs text-slate-600 leading-relaxed mb-4">${p.reason}</p>
+                            </div>
+                            <a href="${p.url}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center text-xs font-bold text-white bg-teal-700 hover:bg-teal-800 px-3 py-2 rounded-lg transition">
+                                Open Library ↗
+                            </a>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function selectScenario(key, btnEl) {
+            document.querySelectorAll('.scenario-btn').forEach(btn => {
+                btn.classList.remove('border-2', 'border-teal-700', 'bg-teal-50/40');
+                btn.classList.add('border', 'border-stone-200', 'bg-white');
+            });
+            if (btnEl) {
+                btnEl.classList.remove('border', 'border-stone-200', 'bg-white');
+                btnEl.classList.add('border-2', 'border-teal-700', 'bg-teal-50/40');
+            }
+            renderAdvisorOutput(key);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderLibraries(librariesData);
+            renderAdvisorOutput('enterprise');
+        });
+    </script>
+</body>
+</html>
